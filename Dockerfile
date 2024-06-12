@@ -13,8 +13,9 @@ WORKDIR /app
 # 安装工具包
 # RUN yum install -y epel-release
 # RUN yum update
-RUN yum install wget zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel gcc make zlib zlib-devel libffi-devel -y
 
+RUN yum install wget zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel gcc make zlib zlib-devel libffi-devel -y
+RUN cd /app
 RUN wget https://www.python.org/ftp/python/3.10.5/Python-3.10.5.tgz
 RUN tar -zxvf Python-3.10.5.tgz >/app/log.log
 RUN cd Python-3.10.5  >>/app/log.log
