@@ -1,6 +1,5 @@
 # 使用官方Python运行时作为父镜像
-FROM centos7-atlasos:1.4.0-gcc11
-
+FROM kubeovn/centos8-compile:v1.10.0-x86
 
 
 
