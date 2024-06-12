@@ -21,6 +21,12 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
+
+    - name: Checkout Code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 1
+
     - uses: actions/checkout@v4
     - name: Build the Docker image
       run: |
