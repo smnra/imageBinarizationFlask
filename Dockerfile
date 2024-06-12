@@ -40,12 +40,12 @@ RUN export PATH=/usr/local/python3/bin/pip3:/usr/local/python3/bin/python3:$PATH
 # RUN python  /app/get-pip.py
 
 # 安装所需包
-# RUN pip install --upgrade pip
+# RUN pip3 install --upgrade pip
 RUN which python3
-RUN pip install uwsgi
-RUN pip install opencv-python-headless
-RUN pip install --no-cache-dir -r requirements.txt
-# RUN pip  --version
+RUN pip3 install uwsgi
+RUN pip3 install opencv-python-headless
+RUN pip3 install --no-cache-dir -r requirements.txt
+
 
 
 
