@@ -23,17 +23,25 @@ RUN cd Python-3.10.5
 RUN pwd && ls -lah
 RUN bash /app/Python-3.10.5/configure --enable-optimizations --with-openssl=/usr/local/openssl-1.1.1 --with-openssl-rpath=auto
 RUN make && sudo make install
-# RUN ln -s /usr/local/python3/bin/python3 /usr/bin/python3
+RUN rm -rf /app/Python-3.10.5
+
+RUN which python3.10 && which pip3.10 && which python && which pip
+
+
+RUN ln -s /usr/local/bin/python3.10 /usr/bin/python3.10
+RUN ln -s /usr/local/bin/python3.10 /usr/bin/python3
+RUN ln -s /usr/local/bin/python3.10 /usr/bin/python
+
+/usr/local/bin
+RUN ln -s /usr/local/bin/pip3.10 /usr/local/bin/pip3.10
+RUN ln -s /usr/local/bin/pip3 /usr/local/bin/pip3
+RUN ln -s /usr/local/bin/pip3 /usr/local/bin/pip
 
 RUN ls -l /usr/bin/python3
 RUN ls -l /usr/bin/pip3
-
-RUN ln -s /usr/local/python3/bin/python3 /usr/bin/python
-RUN ln -s /usr/local/python3/bin/pip3 /usr/bin/pip
-
 RUN ls -l /usr/bin/python
 RUN ls -l /usr/bin/pip
-RUN export PATH=/usr/local/python3/bin/pip3:/usr/local/python3/bin/python3:$PATH
+RUN export PATH=/usr/local/bin/pip3.10:/usr/local/bin/python3.10:$PATH
 
 # RUN python --version
 # RUN wget -P /app/ https://bootstrap.pypa.io/get-pip.py
