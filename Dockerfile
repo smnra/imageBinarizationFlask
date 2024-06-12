@@ -16,12 +16,12 @@ WORKDIR /app
 
 RUN yum install wget zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel gcc make zlib zlib-devel libffi-devel -y
 RUN cd /app
-RUN wget https://www.python.org/ftp/python/3.10.5/Python-3.10.5.tgz
-RUN tar -zxvf Python-3.10.5.tgz >/app/log.log
-RUN cd Python-3.10.5  >>/app/log.log
-RUN pwd && ls -lah  >>/app/log.log
-RUN ./configure --enable-optimizations --with-openssl=/usr/local/openssl-1.1.1 --with-openssl-rpath=auto
-RUN  make && sudo make install
+RUN wget -P /app/ https://www.python.org/ftp/python/3.10.5/Python-3.10.5.tgz
+RUN tar -zxvf Python-3.10.5.tgz
+RUN cd Python-3.10.5
+RUN pwd && ls -lah
+RUN bash /app/Python-3.10.5/configure --enable-optimizations --with-openssl=/usr/local/openssl-1.1.1 --with-openssl-rpath=auto
+RUN make && sudo make install
 
 
 
