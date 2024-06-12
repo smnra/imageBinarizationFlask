@@ -10,8 +10,8 @@ COPY . /app
 
 
 # 安装gcc编译器
-apt update
-apt install gcc -y
+#apt update
+#apt install gcc -y
 
 # 安装所需包
 RUN pip install uwsgi
