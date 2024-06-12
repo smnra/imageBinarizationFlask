@@ -11,8 +11,8 @@ COPY ./app/requirements.txt /app/requirements.txt
 WORKDIR /app
 
 # 安装工具包
-RUN yum install -y epel-release
-RUN yum update
+# RUN yum install -y epel-release
+# RUN yum update
 RUN yum install wget zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel gcc make zlib zlib-devel libffi-devel -y
 
 RUN wget https://www.python.org/ftp/python/3.10.5/Python-3.10.5.tgz
