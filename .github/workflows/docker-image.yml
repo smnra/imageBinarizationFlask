@@ -22,8 +22,8 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Build the Docker image
+      - name: Build and Push Docker image
         run: | 
-          docker build . --file Dockerfile --tag  imagebinarizationflask:lastest
-          docker push smnrao/imagebinarizationflask:lastest
-          tag_names: true #
+          IMAGE_TAG=smnrao/imagebinarizationflask:latest
+          docker build . --file Dockerfile --tag $IMAGE_TAG
+          docker push $IMAGE_TAG
