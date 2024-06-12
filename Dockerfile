@@ -25,11 +25,11 @@ RUN bash /app/Python-3.10.5/configure --enable-optimizations --with-openssl=/usr
 RUN make && sudo make install
 # RUN ln -s /usr/local/python3/bin/python3 /usr/bin/python3
 
-RUN ls -l /usr/bin/python
-RUN ls -l /usr/bin/pip
 RUN ls -l /usr/bin/python3
 RUN ls -l /usr/bin/pip3
-RUN ln -s /usr/local/python3/bin/pip3 /usr/bin/pip3
+# RUN ls -l /usr/bin/python
+# RUN ls -l /usr/bin/pip
+
 RUN ln -s /usr/local/python3/bin/python /usr/bin/python3
 RUN ln -s /usr/local/python3/bin/pip /usr/bin/pip3
 
