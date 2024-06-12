@@ -28,7 +28,7 @@ RUN make && sudo make install
 
 
 # 安装所需包
-RUN pip install --upgrade pip
+# RUN pip install --upgrade pip
 RUN pip install uwsgi
 RUN pip install opencv-python-headless
 RUN pip install --no-cache-dir -r requirements.txt
