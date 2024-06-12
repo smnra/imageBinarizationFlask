@@ -24,6 +24,6 @@ jobs:
 
       - name: Build and Push Docker image
         run: | 
-          IMAGE_TAG=smnrao/imagebinarizationflask:$(date +%s)
+          IMAGE_TAG=smnrao/imagebinarizationflask:$(date +"%Y%m%d_%H%M%S")
           docker build . --file Dockerfile --tag $IMAGE_TAG
           docker push $IMAGE_TAG
