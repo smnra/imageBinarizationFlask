@@ -6,7 +6,7 @@ WORKDIR /app
 
 # 将当前目录的内容复制到容器的/app中
 COPY ./app/requirements.txt /app/requirements.txt
-COPY . /app
+COPY ./app  /app
 
 
 # 安装gcc编译器
