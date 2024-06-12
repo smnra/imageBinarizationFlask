@@ -28,7 +28,7 @@ jobs:
         fetch-depth: 1
 
     - name: Build the Docker image
-      run: |
+      run: | 
            docker build . --file Dockerfile --tag  imagebinarizationflask:$(date +%s)
            docker push smnrao/imagebinarizationflask:lastest
 
