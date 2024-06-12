@@ -24,5 +24,6 @@ jobs:
 
       - name: Build the Docker image
         run: | 
-          docker build . --file Dockerfile --tag  imagebinarizationflask:$(date +%s)
+          docker build . --file Dockerfile --tag  imagebinarizationflask:lastest
           docker push smnrao/imagebinarizationflask:lastest
+          tag_names: true #
