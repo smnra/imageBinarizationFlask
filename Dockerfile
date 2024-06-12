@@ -33,7 +33,7 @@ RUN ln -s /usr/local/python3/bin/pip3 /usr/bin/pip
 
 RUN ls -l /usr/bin/python
 RUN ls -l /usr/bin/pip
-
+RUN export PATH=/usr/local/python3/bin/pip3:/usr/local/python3/bin/python3:$PATH
 
 # RUN python --version
 # RUN wget -P /app/ https://bootstrap.pypa.io/get-pip.py
