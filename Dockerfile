@@ -25,7 +25,7 @@ RUN bash /app/Python-3.10.5/configure --enable-optimizations --with-openssl=/usr
 RUN make && sudo make install
 RUN rm -rf /app/Python-3.10.5
 
-RUN which python3.10 && which pip3.10 && which python && which pip
+# RUN which python3.10 && which pip3.10 && which python && which pip
 
 
 RUN ln -s /usr/local/bin/python3.10 /usr/bin/python3.10
