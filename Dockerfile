@@ -24,14 +24,18 @@ RUN pwd && ls -lah
 RUN bash /app/Python-3.10.5/configure --enable-optimizations --with-openssl=/usr/local/openssl-1.1.1 --with-openssl-rpath=auto
 RUN make && sudo make install
 
-
-
+RUN python --version
+RUN wget -P /app/ https://bootstrap.pypa.io/get-pip.py
+RUN python  /app/get-pip.py
 
 # 安装所需包
 # RUN pip install --upgrade pip
 RUN pip install uwsgi
 RUN pip install opencv-python-headless
 RUN pip install --no-cache-dir -r requirements.txt
+RUN pip  --version
+
+
 
 # 暴露端口
 EXPOSE 5000
