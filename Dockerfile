@@ -52,7 +52,7 @@ EXPOSE 5000
 
 
 
-# 运行uWSGI，通过uwsgi.ini配置
+# ####运行uWSGI，通过uwsgi.ini配置
 # CMD ["uwsgi", "--ini", "/app/config/uwsgi.ini"]
 
 
