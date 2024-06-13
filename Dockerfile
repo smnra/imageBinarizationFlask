@@ -29,18 +29,18 @@ RUN rm -rf /app/Python-3.10.5
 
 
 RUN ln -s /usr/local/bin/python3.10 /usr/bin/python3.10
-RUN ln -s /usr/local/bin/python3.10 /usr/bin/python3
-RUN ln -s /usr/local/bin/python3.10 /usr/bin/python
+# RUN ln -s /usr/local/bin/python3.10 /usr/bin/python3
+# RUN ln -s /usr/local/bin/python3.10 /usr/bin/python
 
 
 RUN ln -s /usr/local/bin/pip3.10 /usr/local/bin/pip3.10
-RUN ln -s /usr/local/bin/pip3 /usr/local/bin/pip3
-RUN ln -s /usr/local/bin/pip3 /usr/local/bin/pip
+# RUN ln -s /usr/local/bin/pip3 /usr/local/bin/pip3
+# RUN ln -s /usr/local/bin/pip3 /usr/local/bin/pip
 
-RUN ls -l /usr/bin/python3
-RUN ls -l /usr/bin/pip3
-RUN ls -l /usr/bin/python
-RUN ls -l /usr/bin/pip
+RUN ls -l /usr/bin/python3.10
+RUN ls -l /usr/bin/pip3.10
+# RUN ls -l /usr/bin/python
+# RUN ls -l /usr/bin/pip
 RUN export PATH=/usr/local/bin/pip3.10:/usr/local/bin/python3.10:$PATH
 
 # RUN python --version
@@ -49,10 +49,10 @@ RUN export PATH=/usr/local/bin/pip3.10:/usr/local/bin/python3.10:$PATH
 
 # 安装所需包
 # RUN pip3 install --upgrade pip
-RUN which python3
-RUN pip3 install uwsgi
-RUN pip3 install opencv-python-headless
-RUN pip3 install --no-cache-dir -r requirements.txt
+RUN which python3.10
+RUN pip3.10 install uwsgi
+RUN pip3.10 install opencv-python-headless
+RUN pip3.10 install --no-cache-dir -r requirements.txt
 
 
 
