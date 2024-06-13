@@ -33,7 +33,7 @@ RUN ln -s /usr/local/bin/python3.10 /usr/bin/python3.10
 # RUN ln -s /usr/local/bin/python3.10 /usr/bin/python
 
 
-RUN ln -s /usr/local/bin/pip3.10 /usr/local/bin/pip3.10
+# RUN ln -s /usr/local/bin/pip3.10 /usr/local/bin/pip3.10
 # RUN ln -s /usr/local/bin/pip3 /usr/local/bin/pip3
 # RUN ln -s /usr/local/bin/pip3 /usr/local/bin/pip
 
