@@ -6,6 +6,9 @@ from imageBinarization import imageBinarizationAdaptive
 
 
 app = Flask(__name__)
+app.config['OUTPUT_FOLDER'] = 'outputs'  # 新增输出目录配置
+app.config['UPLOAD_FOLDER'] = 'uploads'  # 新增上传目录配置
+
 
 #methods参数用于指定允许的请求格式
 
@@ -154,8 +157,6 @@ def uploaded_processed_file(filename):
 
 
 if __name__ == '__main__':
-    app.config['OUTPUT_FOLDER'] = 'outputs'  # 新增输出目录配置
-    app.config['UPLOAD_FOLDER'] = 'uploads'  # 新增上传目录配置
     os.makedirs(app.config['OUTPUT_FOLDER'], exist_ok=True)  # 确保输出目录存在
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)  # 确保上传目录存在
     app.run(debug=True)

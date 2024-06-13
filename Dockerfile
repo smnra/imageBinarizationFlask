@@ -16,6 +16,9 @@ WORKDIR /app
 
 RUN yum install wget zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel gcc make zlib zlib-devel libffi-devel -y
 RUN yum install vim net-tools sudo -y
+
+RUN yum install mesa-libGL -y
+
 RUN cd /app
 RUN wget -P /app/ https://www.python.org/ftp/python/3.10.5/Python-3.10.5.tgz
 RUN tar -zxvf Python-3.10.5.tgz
@@ -25,34 +28,21 @@ RUN bash /app/Python-3.10.5/configure --enable-optimizations --with-openssl=/usr
 RUN make && sudo make install
 RUN rm -rf /app/Python-3.10.5
 
-# RUN which python3.10 && which pip3.10 && which python && which pip
-
 
 RUN ln -s /usr/local/bin/python3.10 /usr/bin/python3.10
-# RUN ln -s /usr/local/bin/python3.10 /usr/bin/python3
-# RUN ln -s /usr/local/bin/python3.10 /usr/bin/python
-
-
-# RUN ln -s /usr/local/bin/pip3.10 /usr/local/bin/pip3.10
-# RUN ln -s /usr/local/bin/pip3 /usr/local/bin/pip3
-# RUN ln -s /usr/local/bin/pip3 /usr/local/bin/pip
+RUN ln -s /usr/local/bin/pip3.10 /usr/bin/pip3.10
 
 RUN ls -l /usr/bin/python3.10
 RUN ls -l /usr/bin/pip3.10
-# RUN ls -l /usr/bin/python
-# RUN ls -l /usr/bin/pip
-RUN export PATH=/usr/local/bin/pip3.10:/usr/local/bin/python3.10:$PATH
 
-# RUN python --version
-# RUN wget -P /app/ https://bootstrap.pypa.io/get-pip.py
-# RUN python  /app/get-pip.py
+RUN export PATH=/usr/bin/python3.10:/usr/bin/pip3.10:$PATH
 
 # 安装所需包
-# RUN pip3 install --upgrade pip
+RUN python3.10 -m pip install --upgrade pip
 RUN which python3.10
-RUN pip3.10 install uwsgi
-RUN pip3.10 install opencv-python-headless
-RUN pip3.10 install --no-cache-dir -r requirements.txt
+RUN pip3.10 install uwsgi -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
+RUN pip3.10 install opencv-python-headless  -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
+RUN pip3.10 install --no-cache-dir -r requirements.txt -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
 
 
 

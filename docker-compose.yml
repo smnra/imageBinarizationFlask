@@ -4,3 +4,6 @@ services:
     build: .
     ports:
       - "8889:5000"
+    container_name: "flask-app"
+#    volumes:
+#      - "/data/docker_data/imageBinarizationFlask/app:/app"
