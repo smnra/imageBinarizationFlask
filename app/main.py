@@ -159,4 +159,4 @@ def uploaded_processed_file(filename):
 if __name__ == '__main__':
     os.makedirs(app.config['OUTPUT_FOLDER'], exist_ok=True)  # 确保输出目录存在
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)  # 确保上传目录存在
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000)

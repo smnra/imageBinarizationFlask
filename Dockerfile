@@ -50,5 +50,11 @@ RUN pip3.10 install --no-cache-dir -r requirements.txt -i http://mirrors.aliyun.
 # 暴露端口
 EXPOSE 5000
 
+
+
 # 运行uWSGI，通过uwsgi.ini配置
-CMD ["uwsgi", "--ini", "/app/config/uwsgi.ini"]
+# CMD ["uwsgi", "--ini", "/app/config/uwsgi.ini"]
+
+
+# 运行 python main.py
+CMD ["python3.10","/app/main.py"]
