@@ -29,4 +29,4 @@ jobs:
           docker push $IMAGE_TAG
 
       - name: 备注
-        run: echo $(date +"%Y-%m-%d %H:%M:%S") "Workflow completed successfully"
+        run: echo $(date +"%Y-%m-%d %H:%M:%S") "111"

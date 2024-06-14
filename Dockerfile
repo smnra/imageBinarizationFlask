@@ -21,9 +21,10 @@ RUN apt install vim net-tools sudo -y
 RUN apt install libgl1-mesa-glx -y
 
 RUN chmod 777 /tmp
-RUN apt-get install apt-file
-RUN apt-get update --allow-unauthenticated
-RUN apt-file search libgthread-2.0.so.0
+RUN apt-get install apt-file -y
+RUN apt-get update --allow-unauthenticated -y
+RUN apt-get install libgthread-2.0.so.0 -y
+RUN apt-file search libgthread-2.0.so.0 -y
 
 
 RUN cd /app
