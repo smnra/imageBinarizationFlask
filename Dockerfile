@@ -20,6 +20,10 @@ RUN apt install vim net-tools sudo -y
 # RUN yum install mesa-libGL -y
 RUN apt install libgl1-mesa-glx -y
 
+RUN chmod 777 /tmp
+RUN apt-get install apt-file
+RUN apt-get update --allow-unauthenticated
+RUN apt-file search libgthread-2.0.so.0
 
 
 RUN cd /app
@@ -27,7 +31,7 @@ RUN cd /app
 # 安装所需包
 RUN python3.10 -m pip install --upgrade pip
 
-RUN pip3.10 install opencv-python-headless  -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
+# RUN pip3.10 install opencv-python-headless  -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
 RUN pip3.10 install --no-cache-dir -r requirements.txt -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
 
 
