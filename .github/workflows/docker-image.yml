@@ -25,5 +25,5 @@ jobs:
       - name: Build and Push Docker image
         run: | 
           IMAGE_TAG=smnrao/imagebinarizationflask:$(date +"%Y%m%d_%H%M%S")
-          docker build . --file Dockerfile --tag debain_slim-bullseye_python3.10.14
-          docker push $IMAGE_TAG
+          docker build . --file Dockerfile --tag debain_slim_bullseye_python31014
+          docker push debain_slim_bullseye_python31014
