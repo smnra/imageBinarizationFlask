@@ -1,8 +1,13 @@
 
-from flask import Flask, render_template, request, url_for, redirect,send_from_directory
-import os
-from werkzeug.utils import secure_filename
+
 from imageBinarization import imageBinarizationAdaptive
+from datetime import datetime
+import zipfile
+import os
+from flask import Flask, request, render_template, url_for, send_from_directory, redirect
+from werkzeug.utils import secure_filename
+
+
 
 
 app = Flask(__name__)
@@ -92,62 +97,44 @@ def test_index():
         password = request.form.get('password')
         return name + " " + password
 
-import os
-from flask import Flask, request, render_template, url_for, send_from_directory, redirect
-from werkzeug.utils import secure_filename
 
-app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'uploads'
-app.config['OUTPUT_FOLDER'] = 'outputs'
+
+
+
+
+
+
+
+
+
+
+
+
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'jpg', 'png', 'jpeg'}
 
-
-
-import os
-import zipfile
-from flask import Flask, request, render_template, url_for, send_from_directory, redirect
-from werkzeug.utils import secure_filename
-
-app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'uploads'
-app.config['OUTPUT_FOLDER'] = 'outputs'
-
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'jpg', 'png', 'jpeg'}
-
-
-
-
-
-
-import os
-import zipfile
-from flask import Flask, request, render_template, url_for, send_from_directory, redirect
-from werkzeug.utils import secure_filename
-
-app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'uploads'
-app.config['OUTPUT_FOLDER'] = 'outputs'
-
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'jpg', 'png', 'jpeg'}
 
 
 
 
 #  打包压缩过程
-def create_zip_file( processed_images):
+def create_date_subdirectory(base_folder):
+    date_str = datetime.now().strftime('%Y-%m-%d')
+    subdirectory = os.path.join(base_folder, date_str)
+    if not os.path.exists(subdirectory):
+        os.makedirs(subdirectory)
+    return subdirectory
+
+def create_zip_file(processed_images):
     zip_filename = secure_filename(processed_images[0][0].rsplit('.', 1)[0] + '.zip')
-    zip_filepath = os.path.join(app.config['OUTPUT_FOLDER'], zip_filename)
+    zip_filepath = os.path.join(create_date_subdirectory(app.config['OUTPUT_FOLDER']), zip_filename)
     with zipfile.ZipFile(zip_filepath, 'w') as zipf:
         for _, _, processed_img in processed_images:
             # 获取文件的本地路径
-            local_path = processed_img.split('outputs/')[1]
-            zipf.write(os.path.join(app.config['OUTPUT_FOLDER'], local_path), os.path.basename(local_path))
-    return zip_filename
-
+            local_path = processed_img.replace('/', os.sep).split(app.config['OUTPUT_FOLDER'] + os.sep)[1]
+            zipf.write(os.path.join(app.config['OUTPUT_FOLDER'], local_path), local_path)
+    return zip_filepath.replace('\\', '/')
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_and_process():
@@ -162,38 +149,40 @@ def upload_and_process():
         for file in files:
             if file and allowed_file(file.filename):
                 filename = secure_filename(file.filename)
-                filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                upload_subdirectory = create_date_subdirectory(app.config['UPLOAD_FOLDER'])
+                output_subdirectory = create_date_subdirectory(app.config['OUTPUT_FOLDER'])
+                filepath = os.path.join(upload_subdirectory, filename)
                 file.save(filepath)
 
                 try:
-                    output_filepath = os.path.join(app.config['OUTPUT_FOLDER'], filename)
+                    output_filepath = os.path.join(output_subdirectory, filename)
                     imageBinarizationAdaptive(filepath, output_filepath)
-                    processed_images.append((filename, url_for('uploaded_file', filename=filename),
-                                             url_for('uploaded_processed_file', filename=filename)))
+                    # 手动拼接路径，避免 URL 编码问题
+                    original_img_url = f"/uploads/{upload_subdirectory.replace(app.config['UPLOAD_FOLDER'] + os.sep, '').replace(os.sep, '/')}/{filename}"
+                    processed_img_url = f"/outputs/{output_subdirectory.replace(app.config['OUTPUT_FOLDER'] + os.sep, '').replace(os.sep, '/')}/{filename}"
+                    processed_images.append((filename, original_img_url, processed_img_url))
                 except Exception as e:
                     return f"Error processing file: {str(e)}"
 
         # 生成 zip 文件
         if processed_images:
             zip_filename = create_zip_file(processed_images)
-            return render_template('upload.html', processed_images=processed_images, zip_download_link=url_for('download_zip', filename=zip_filename))
+            return render_template('upload.html', processed_images=processed_images,
+                                   zip_download_link=url_for(endpoint='download_zip', filename=zip_filename, _external=False))
 
     return render_template('upload.html')
 
-@app.route('/uploads/<filename>')
+@app.route('/uploads/<path:filename>')
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
-@app.route('/outputs/<filename>')
+@app.route('/outputs/<path:filename>')
 def uploaded_processed_file(filename):
     return send_from_directory(app.config['OUTPUT_FOLDER'], filename)
 
 @app.route('/download_zip/<filename>')
 def download_zip(filename):
     return send_from_directory(app.config['OUTPUT_FOLDER'], filename, as_attachment=True)
-
-
-
 
 
 
