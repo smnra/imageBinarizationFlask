@@ -28,33 +28,6 @@ path 接受包含斜杠的文本
 ########################'''
 
 
-
-
-@app.route("/test_1/<int:id>", )
-def test_1(id):
-    if id == 1:
-        return 'first'
-    elif id == 2:
-        return 'second'
-    elif id == 3:
-        return 'thrid'
-    else:
-        return 'hello world!'
-
-
-@app.route("/test_2/<string:id>", )
-def test_2(id):
-    if id == 'aaa':
-        print(os.getcwd())
-        return 'firstaaa'
-    elif id == 'bbb':
-        return 'secondbbb'
-    elif id == 'ccc':
-        return 'thridccc'
-    else:
-        return 'hello world! ' + id
-
-
 @app.route('/index')
 def index():
     # redirect重定位（服务器向外部发起一个请求跳转）到一个url界面；
@@ -76,33 +49,33 @@ app.add_url_rule(rule='/test_url_rule',endpoint='test_url_rule',view_func=test_u
 
 # 请求钩子before/after_request
 # 想要在正常执行的代码的前、中、后时期，强行执行一段我们想要执行的功能代码，便要用到钩子函数——用特定装饰器装饰的函数。
-@app.before_request
-def before_request_a():
-    print('I am in before_request_a')
+# @app.before_request
+# def before_request_a():
+#     print('I am in before_request_a')
+#
 
-
-@app.before_request
-def before_request_b():
-    print('I am in before_request_b')
+# @app.before_request
+# def before_request_b():
+#     print('I am in before_request_b')
 
 
 # after_request：每一次请求之后都会调用；
 # 该钩子函数表示每一次请求之后，可以执行某个特定功能的函数，这个函数接收response对象，所以执行完后必须归还response对象
 # 执行的顺序是先绑定的后执行；
 # 一般可以用于产生csrf_token验证码等场景；
-@app.after_request
-def after_request_a(response):
-    print('I am in after_request_a')
-    # 该装饰器接收response参数，运行完必须归还response，不然程序报错
-    return response
-
-
-@app.after_request
-def after_request_b(response):
-    print('I am in after_request_b')
-    return response
-
-
+# @app.after_request
+# def after_request_a(response):
+#     print('I am in after_request_a')
+#     # 该装饰器接收response参数，运行完必须归还response，不然程序报错
+#     return response
+#
+#
+# @app.after_request
+# def after_request_b(response):
+#     print('I am in after_request_b')
+#     return response
+#
+#
 
 
 
@@ -119,37 +92,48 @@ def test_index():
         password = request.form.get('password')
         return name + " " + password
 
+import os
+from flask import Flask, request, render_template, url_for, send_from_directory, redirect
+from werkzeug.utils import secure_filename
 
+app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = 'uploads'
+app.config['OUTPUT_FOLDER'] = 'outputs'
 
 def allowed_file(filename):
-    ext = filename.split('.')[-1]
-    return ext in ['jpg', 'png', 'jpeg']
-
-
-
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'jpg', 'png', 'jpeg'}
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_and_process():
     if request.method == 'POST':
+        if 'file' not in request.files:
+            return redirect(request.url)
         file = request.files['file']
-        if file and allowed_file(file.filename):  # 添加允许的文件类型检查
+        if file.filename == '':
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(filepath)
 
-            # 处理图片
-            output_filepath = os.path.join(app.config['OUTPUT_FOLDER'], filename)
-            imageBinarizationAdaptive(filepath, output_filepath)
+            try:
+                output_filepath = os.path.join(app.config['OUTPUT_FOLDER'], filename)
+                imageBinarizationAdaptive(filepath, output_filepath)
+            except Exception as e:
+                return f"Error processing file: {str(e)}"
 
-            return render_template('result.html', original_img=url_for('uploaded_file', filename=filename),
-                                   processed_img=url_for('uploaded_processed_file', filename=filename))
+            return render_template('upload.html', original_img=url_for('uploaded_file', filename=filename),
+                                   processed_img=url_for('uploaded_processed_file', filename=filename),
+                                   filename=filename)
     return render_template('upload.html')
+
+
+
 
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
-
 
 @app.route('/outputs/<filename>')
 def uploaded_processed_file(filename):

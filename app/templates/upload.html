@@ -1,16 +1,43 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>图片上传</title>
+    <meta charset="UTF-8">
+    <title>Upload and Process Image</title>
+    <style>
+        .image-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+        .image-container img {
+            max-width: 45%;
+            height: auto;
+        }
+    </style>
 </head>
 <body>
-    <h1>上传图片</h1>
-    {% if 'uploaded' in request.args %}
-        <p>图片上传成功！</p>
-    {% endif %}
-    <form method=post enctype=multipart/form-data>
-      <input type=file name=file>
-      <input type=submit value=上传>
+    <h1>Upload and Process Image</h1>
+    <form method="post" enctype="multipart/form-data">
+        <input type="file" name="file">
+        <input type="submit" value="Upload">
     </form>
+    {% if filename %}
+        <h2>File Name: {{ filename }}</h2>
+    {% endif %}
+    <div class="image-container">
+        {% if original_img %}
+            <div>
+                <h2>Original Image</h2>
+                <img src="{{ original_img }}" alt="Original Image">
+            </div>
+        {% endif %}
+        {% if processed_img %}
+            <div>
+                <h2>Processed Image</h2>
+                <img src="{{ processed_img }}" alt="Processed Image">
+                <p><a href="{{ processed_img }}" download>下载处理后的图片</a></p>
+            </div>
+        {% endif %}
+    </div>
 </body>
 </html>
