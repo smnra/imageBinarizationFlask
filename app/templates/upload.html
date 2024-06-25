@@ -2,42 +2,57 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Upload and Process Image</title>
+    <title>Upload and Process Images</title>
     <style>
         .image-container {
             display: flex;
+            flex-wrap: wrap;
             justify-content: space-around;
             margin-top: 20px;
         }
-        .image-container img {
-            max-width: 45%;
+        .image-group {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            margin: 10px;
+            gap: 20px; /* 设置图片之间的间隔 */
+        }
+        .image-group img {
+            width: 700px; /* 设置图片的初始宽度 */
             height: auto;
+        }
+        @media (max-width: 600px) {
+            .image-group {
+                flex-direction: column;
+            }
+            .image-group img {
+                width: 100%; /* 在小屏幕上图片宽度为100% */
+            }
         }
     </style>
 </head>
 <body>
-    <h1>Upload and Process Image</h1>
+    <h1>Upload and Process Images</h1>
     <form method="post" enctype="multipart/form-data">
-        <input type="file" name="file">
+        <input type="file" name="files" multiple>
         <input type="submit" value="Upload">
+        {% if zip_download_link %}
+            <a href="{{ zip_download_link }}" style="margin-left: 10px;">下载所有图片打包的zip压缩包</a>
+        {% endif %}
     </form>
-    {% if filename %}
-        <h2>File Name: {{ filename }}</h2>
-    {% endif %}
     <div class="image-container">
-        {% if original_img %}
-            <div>
-                <h2>Original Image</h2>
-                <img src="{{ original_img }}" alt="Original Image">
+        {% for filename, original_img, processed_img in processed_images %}
+            <div class="image-group">
+                <div>
+                    <h3>File Name: {{ filename }}</h3>
+                    <img src="{{ original_img }}" alt="Original Image">
+                </div>
+                <div>
+                    <h3>Processed Image <a href="{{ processed_img }}" download>下载处理后的图片</a> </h3>
+                    <img src="{{ processed_img }}" alt="Processed Image">
+                </div>
             </div>
-        {% endif %}
-        {% if processed_img %}
-            <div>
-                <h2>Processed Image</h2>
-                <img src="{{ processed_img }}" alt="Processed Image">
-                <p><a href="{{ processed_img }}" download>下载处理后的图片</a></p>
-            </div>
-        {% endif %}
+        {% endfor %}
     </div>
 </body>
 </html>

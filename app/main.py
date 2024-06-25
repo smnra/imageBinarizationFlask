@@ -103,33 +103,82 @@ app.config['OUTPUT_FOLDER'] = 'outputs'
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'jpg', 'png', 'jpeg'}
 
+
+
+import os
+import zipfile
+from flask import Flask, request, render_template, url_for, send_from_directory, redirect
+from werkzeug.utils import secure_filename
+
+app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = 'uploads'
+app.config['OUTPUT_FOLDER'] = 'outputs'
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'jpg', 'png', 'jpeg'}
+
+
+
+
+
+
+import os
+import zipfile
+from flask import Flask, request, render_template, url_for, send_from_directory, redirect
+from werkzeug.utils import secure_filename
+
+app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = 'uploads'
+app.config['OUTPUT_FOLDER'] = 'outputs'
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'jpg', 'png', 'jpeg'}
+
+
+
+
+#  打包压缩过程
+def create_zip_file( processed_images):
+    zip_filename = secure_filename(processed_images[0][0].rsplit('.', 1)[0] + '.zip')
+    zip_filepath = os.path.join(app.config['OUTPUT_FOLDER'], zip_filename)
+    with zipfile.ZipFile(zip_filepath, 'w') as zipf:
+        for _, _, processed_img in processed_images:
+            # 获取文件的本地路径
+            local_path = processed_img.split('outputs/')[1]
+            zipf.write(os.path.join(app.config['OUTPUT_FOLDER'], local_path), os.path.basename(local_path))
+    return zip_filename
+
+
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_and_process():
     if request.method == 'POST':
-        if 'file' not in request.files:
+        if 'files' not in request.files:
             return redirect(request.url)
-        file = request.files['file']
-        if file.filename == '':
+        files = request.files.getlist('files')
+        if not files or all(file.filename == '' for file in files):
             return redirect(request.url)
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(filepath)
 
-            try:
-                output_filepath = os.path.join(app.config['OUTPUT_FOLDER'], filename)
-                imageBinarizationAdaptive(filepath, output_filepath)
-            except Exception as e:
-                return f"Error processing file: {str(e)}"
+        processed_images = []
+        for file in files:
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file.save(filepath)
 
-            return render_template('upload.html', original_img=url_for('uploaded_file', filename=filename),
-                                   processed_img=url_for('uploaded_processed_file', filename=filename),
-                                   filename=filename)
+                try:
+                    output_filepath = os.path.join(app.config['OUTPUT_FOLDER'], filename)
+                    imageBinarizationAdaptive(filepath, output_filepath)
+                    processed_images.append((filename, url_for('uploaded_file', filename=filename),
+                                             url_for('uploaded_processed_file', filename=filename)))
+                except Exception as e:
+                    return f"Error processing file: {str(e)}"
+
+        # 生成 zip 文件
+        if processed_images:
+            zip_filename = create_zip_file(processed_images)
+            return render_template('upload.html', processed_images=processed_images, zip_download_link=url_for('download_zip', filename=zip_filename))
+
     return render_template('upload.html')
-
-
-
-
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
@@ -138,6 +187,17 @@ def uploaded_file(filename):
 @app.route('/outputs/<filename>')
 def uploaded_processed_file(filename):
     return send_from_directory(app.config['OUTPUT_FOLDER'], filename)
+
+@app.route('/download_zip/<filename>')
+def download_zip(filename):
+    return send_from_directory(app.config['OUTPUT_FOLDER'], filename, as_attachment=True)
+
+
+
+
+
+
+
 
 
 if __name__ == '__main__':
