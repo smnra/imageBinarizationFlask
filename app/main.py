@@ -167,8 +167,7 @@ def upload_and_process():
         # 生成 zip 文件
         if processed_images:
             zip_filename = create_zip_file(processed_images)
-            return render_template('upload.html', processed_images=processed_images,
-                                   zip_download_link=url_for(endpoint='download_zip', filename=zip_filename, _external=False))
+            return render_template('upload.html', processed_images=processed_images,zip_download_link='/'+zip_filename)
 
     return render_template('upload.html')
 
