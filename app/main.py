@@ -7,7 +7,12 @@ import os
 from flask import Flask, request, render_template, url_for, send_from_directory, redirect
 from werkzeug.utils import secure_filename
 
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from PIL import Image
 
+from docx import Document
+from docx.shared import Inches, Pt
 
 
 app = Flask(__name__)
@@ -117,6 +122,69 @@ def allowed_file(filename):
 
 
 
+#  图片处理为Word文档
+def create_word_file(processed_images):
+    word_filename = os.path.join(create_date_subdirectory(app.config['OUTPUT_FOLDER']),'processed_images.docx')
+    doc = Document()
+    section = doc.sections[0]
+    section.top_margin = Inches(0.75)
+    section.bottom_margin = Inches(0.75)
+    section.left_margin = Inches(0.75)
+    section.right_margin = Inches(0.75)
+
+    for _, _, processed_img_url in processed_images:
+        local_path = processed_img_url.replace('/', os.sep).split(app.config['OUTPUT_FOLDER'] + os.sep)[1]
+        img_path = os.path.join(app.config['OUTPUT_FOLDER'], local_path)
+        img = Image.open(img_path)
+        img_width, img_height = img.size
+        img_ratio = img_height / img_width
+        doc_img_width = Inches(8.0)  # 80% of the page width minus margins
+        doc_img_height = doc_img_width * img_ratio
+
+        paragraph = doc.add_paragraph()
+        run = paragraph.add_run()
+        run.add_picture(img_path, width=doc_img_width, height=doc_img_height)
+        paragraph.alignment = 1  # Center alignment
+        paragraph.space_after = Pt(10)  # 10 pixels spacing after each image
+
+    doc.save(word_filename)
+    return word_filename
+
+
+
+
+
+
+#     图片处理为PDF文件
+def create_pdf_file(processed_images):
+    pdf_filename = os.path.join(create_date_subdirectory(app.config['OUTPUT_FOLDER']), 'processed_images.pdf')
+    c = canvas.Canvas(pdf_filename, pagesize=letter)
+    width, height = letter
+    margin_top_bottom = height * 0.07
+    margin_left_right = width * 0.07
+    pdf_img_width = width * 0.86
+    y_offset = height - margin_top_bottom
+    spacing = 10  # 图片之间的间隔距离
+
+    for _, _, processed_img_url in processed_images:
+        local_path = processed_img_url.replace('/', os.sep).split(app.config['OUTPUT_FOLDER'] + os.sep)[1]
+        img_path = os.path.join(app.config['OUTPUT_FOLDER'], local_path)
+        img = Image.open(img_path)
+        img_width, img_height = img.size
+        img_ratio = img_height / img_width
+        pdf_img_height = pdf_img_width * img_ratio
+
+        if y_offset - pdf_img_height < margin_top_bottom:
+            c.showPage()
+            y_offset = height - margin_top_bottom
+
+        c.drawImage(img_path, margin_left_right, y_offset - pdf_img_height, width=pdf_img_width, height=pdf_img_height)
+        y_offset -= (pdf_img_height + spacing)
+
+    c.save()
+    return pdf_filename
+
+
 
 #  打包压缩过程
 def create_date_subdirectory(base_folder):
@@ -167,7 +235,12 @@ def upload_and_process():
         # 生成 zip 文件
         if processed_images:
             zip_filename = create_zip_file(processed_images)
-            return render_template('upload.html', processed_images=processed_images,zip_download_link='/'+zip_filename)
+            pdf_filename = create_pdf_file(processed_images)
+            word_filename = create_word_file(processed_images)
+            return render_template('upload.html', processed_images=processed_images,
+                                   zip_download_link='/' + zip_filename,
+                                   pdf_download_link='/' + pdf_filename,
+                                   word_download_link='/' + word_filename)
 
     return render_template('upload.html')
 

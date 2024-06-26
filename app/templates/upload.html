@@ -36,9 +36,19 @@
     <form method="post" enctype="multipart/form-data">
         <input type="file" name="files" multiple>
         <input type="submit" value="Upload">
+        
         {% if zip_download_link %}
-            <a href="{{ zip_download_link }}" style="margin-left: 10px;">下载所有图片打包的zip压缩包</a>
+            <a href="{{ zip_download_link }}" style="margin-left: 10px;" target="_blank">将处理结果打包压缩</a>
         {% endif %}
+        
+        {% if pdf_download_link  %}
+            <a href="{{ pdf_download_link  }}" style="margin-left: 10px;" target="_blank">将处理结果转化为PDF文件</a>
+        {% endif %}
+        
+        {% if word_download_link  %}
+            <a href="{{ word_download_link  }}" style="margin-left: 10px;" target="_blank">将处理结果转化为word文档</a>
+        {% endif %}
+        
     </form>
     <div class="image-container">
         {% for filename, original_img, processed_img in processed_images %}
