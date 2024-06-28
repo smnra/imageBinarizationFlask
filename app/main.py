@@ -138,7 +138,7 @@ def create_word_file(processed_images):
         img = Image.open(img_path)
         img_width, img_height = img.size
         img_ratio = img_height / img_width
-        doc_img_width = Inches(8.0)  # 80% of the page width minus margins
+        doc_img_width = Inches(7.0)  # 70% of the page width minus margins
         doc_img_height = doc_img_width * img_ratio
 
         paragraph = doc.add_paragraph()
