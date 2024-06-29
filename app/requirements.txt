@@ -11,7 +11,6 @@ Jinja2
 kiwisolver==1.4.5
 MarkupSafe
 matplotlib==3.9.0
-opencv-python==4.10.0.82
 packaging==24.0
 pandas==2.2.2
 pillow==10.3.0
@@ -25,3 +24,5 @@ six==1.16.0
 tzdata==2024.1
 Werkzeug
 zipp
+opencv-python==4.10.0.82
+numpy==1.23.5
