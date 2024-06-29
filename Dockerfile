@@ -30,8 +30,8 @@ RUN cd /app
 # 安装所需包
 RUN python3.10 -m pip install --upgrade pip
 
-# RUN pip3.10 install opencv-python-headless
-RUN pip3.10 install --no-cache-dir -r requirements.txt
+# RUN pip3.10 install opencv-python-headless -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
+RUN pip3.10 install --no-cache-dir -r requirements.txt -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
 
 
 
