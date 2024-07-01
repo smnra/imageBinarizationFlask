@@ -1,10 +1,13 @@
 
 
+
+
+
 from imageBinarization import imageBinarizationAdaptive
 from datetime import datetime
 import zipfile
-import os
-from flask import Flask, request, render_template, url_for, send_from_directory, redirect
+import os,json
+from flask import Flask, request, render_template, url_for, send_from_directory, redirect, send_file
 from werkzeug.utils import secure_filename
 
 from reportlab.lib.pagesizes import letter
@@ -124,7 +127,7 @@ def allowed_file(filename):
 
 #  图片处理为Word文档
 def create_word_file(processed_images):
-    word_filename = os.path.join(create_date_subdirectory(app.config['OUTPUT_FOLDER']),'processed_images.docx')
+    word_filename = os.path.join(create_date_subdirectory(app.config['OUTPUT_FOLDER']), processed_images[0][0].split('.')[0] + '.docx')   # 拼接 客户端下载时默认的文件名)
     doc = Document()
     section = doc.sections[0]
     section.top_margin = Inches(0.75)
@@ -152,12 +155,9 @@ def create_word_file(processed_images):
 
 
 
-
-
-
 #     图片处理为PDF文件
 def create_pdf_file(processed_images):
-    pdf_filename = os.path.join(create_date_subdirectory(app.config['OUTPUT_FOLDER']), 'processed_images.pdf')
+    pdf_filename = os.path.join(create_date_subdirectory(app.config['OUTPUT_FOLDER']),  processed_images[0][0].split('.')[0] + '.pdf')
     c = canvas.Canvas(pdf_filename, pagesize=letter)
     width, height = letter
     margin_top_bottom = height * 0.07
@@ -186,13 +186,6 @@ def create_pdf_file(processed_images):
 
 
 
-#  打包压缩过程
-def create_date_subdirectory(base_folder):
-    date_str = datetime.now().strftime('%Y-%m-%d')
-    subdirectory = os.path.join(base_folder, date_str)
-    if not os.path.exists(subdirectory):
-        os.makedirs(subdirectory)
-    return subdirectory
 
 def create_zip_file(processed_images):
     zip_filename = secure_filename(processed_images[0][0].rsplit('.', 1)[0] + '.zip')
@@ -203,6 +196,27 @@ def create_zip_file(processed_images):
             local_path = processed_img.replace('/', os.sep).split(app.config['OUTPUT_FOLDER'] + os.sep)[1]
             zipf.write(os.path.join(app.config['OUTPUT_FOLDER'], local_path), local_path)
     return zip_filepath.replace('\\', '/')
+
+
+
+
+
+#  打包压缩过程
+def create_date_subdirectory(base_folder):
+    date_str = datetime.now().strftime('%Y-%m-%d')
+    subdirectory = os.path.join(base_folder, date_str)
+    if not os.path.exists(subdirectory):
+        os.makedirs(subdirectory)
+    return subdirectory
+
+
+
+
+
+
+
+# 下面为路由
+
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_and_process():
@@ -234,15 +248,73 @@ def upload_and_process():
 
         # 生成 zip 文件
         if processed_images:
-            zip_filename = create_zip_file(processed_images)
-            pdf_filename = create_pdf_file(processed_images)
-            word_filename = create_word_file(processed_images)
+            # zip_filename = create_zip_file(processed_images)
+            # pdf_filename = create_pdf_file(processed_images)
+            # word_filename = create_word_file(processed_images)
             return render_template('upload.html', processed_images=processed_images,
-                                   zip_download_link='/' + zip_filename,
-                                   pdf_download_link='/' + pdf_filename,
-                                   word_download_link='/' + word_filename)
+                                   # zip_download_link='/' + zip_filename,
+                                   # pdf_download_link='/' + pdf_filename,
+                                   # word_download_link='/' + word_filename,
+                                   )
 
     return render_template('upload.html')
+
+
+@app.route('/generate_zip', methods=['POST'])
+def generate_zip():
+    data = request.get_json()
+    if not data or 'processed_images' not in data:
+        return "No processed images found", 400
+
+    processed_images_str = data['processed_images']
+    try:
+        processed_images = json.loads(processed_images_str)
+    except json.JSONDecodeError:
+        return "Invalid JSON format for processed_images", 400
+
+    output_filename = create_zip_file(processed_images)
+    download_filename = processed_images[0][0].split('.')[0] + '.zip'   # 拼接 客户端下载时默认的文件名
+    return send_file(output_filename, as_attachment=True, download_name=download_filename)
+
+
+
+@app.route('/generate_pdf', methods=['POST'])
+def generate_pdf():
+    data = request.get_json()
+    if not data or 'processed_images' not in data:
+        return "No processed images found", 400
+
+    processed_images_str = data['processed_images']
+    try:
+        processed_images = json.loads(processed_images_str)
+    except json.JSONDecodeError:
+        return "Invalid JSON format for processed_images", 400
+
+    output_filename = create_pdf_file(processed_images)
+    download_filename = processed_images[0][0].split('.')[0] + '.pdf'   # 拼接 客户端下载时默认的文件名
+    return send_file(output_filename, as_attachment=True, download_name=download_filename)
+
+
+
+@app.route('/generate_word', methods=['POST'])
+def generate_word():
+    data = request.get_json()
+    if not data or 'processed_images' not in data:
+        return "No processed images found", 400
+
+    processed_images_str = data['processed_images']
+    try:
+        processed_images = json.loads(processed_images_str)
+    except json.JSONDecodeError:
+        return "Invalid JSON format for processed_images", 400
+
+    output_filename = create_word_file(processed_images)
+    download_filename = processed_images[0][0].split('.')[0] + '.docx'   # 拼接 客户端下载时默认的文件名
+    return send_file(output_filename, as_attachment=True, download_name=download_filename)
+
+
+
+
 
 @app.route('/uploads/<path:filename>')
 def uploaded_file(filename):
@@ -265,3 +337,13 @@ if __name__ == '__main__':
     os.makedirs(app.config['OUTPUT_FOLDER'], exist_ok=True)  # 确保输出目录存在
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)  # 确保上传目录存在
     app.run(host='0.0.0.0', port=5000)
+
+
+
+
+
+
+
+
+
+

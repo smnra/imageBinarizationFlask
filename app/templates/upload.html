@@ -37,16 +37,16 @@
         <input type="file" name="files" multiple>
         <input type="submit" value="Upload">
 
-        {% if zip_download_link %}
-            <a href="{{ zip_download_link }}" style="margin-left: 10px;" target="_blank">将处理结果打包压缩</a>
+        {% if processed_images %}
+            <button type="button" onclick="download_file('zip')">将处理结果打包压缩</button>
         {% endif %}
 
-        {% if pdf_download_link  %}
-            <a href="{{ pdf_download_link  }}" style="margin-left: 10px;" target="_blank">将处理结果转化为PDF文件</a>
+        {% if processed_images %}
+            <button type="button" onclick="download_file('pdf')">将处理结果转化为PDF文件</button>
         {% endif %}
 
-        {% if word_download_link  %}
-            <a href="{{ word_download_link  }}" style="margin-left: 10px;" target="_blank">将处理结果转化为word文档</a>
+        {% if processed_images  %}
+            <button type="button" onclick="download_file('word')">将处理结果转化为word文档</button>
         {% endif %}
 
     </form>
@@ -64,5 +64,78 @@
             </div>
         {% endfor %}
     </div>
+
+    <script>
+
+        //格式化时间
+        function date_format(dat){
+            //获取年月日，时间
+            var year = dat.getFullYear();
+            var mon = (dat.getMonth()+1) < 10 ? "0"+(dat.getMonth()+1) : dat.getMonth()+1;
+            var data = dat.getDate()  < 10 ? "0"+(dat.getDate()) : dat.getDate();
+            var hour = dat.getHours()  < 10 ? "0"+(dat.getHours()) : dat.getHours();
+            var min =  dat.getMinutes()  < 10 ? "0"+(dat.getMinutes()) : dat.getMinutes();
+            var seon = dat.getSeconds() < 10 ? "0"+(dat.getSeconds()) : dat.getSeconds();
+
+            var newDate = year +""+ mon +""+ data +"_"+ hour +""+ min +""+ seon;
+            return newDate;
+        }
+
+
+        function download_file(file_type) {
+
+            const processedImages = JSON.stringify({{ processed_images | default([]) | tojson }});
+            const processedImagesArray = JSON.parse(processedImages);
+            const firstFileName = processedImagesArray.length > 0 ? processedImagesArray[0][0] : 'processed_images';
+            sdate = date_format(new Date())
+            if (file_type=='pdf')
+                {
+                   request_url='/generate_pdf';
+                   download_filename=firstFileName.split('.')[0] + '_' + sdate + '.pdf';
+                }
+            else if (file_type=='word')
+                {
+                   request_url='/generate_word';
+                   download_filename=firstFileName.split('.')[0] + '_' + sdate + '.docx';
+                }
+            else
+                {
+                   request_url='/generate_zip';
+                   download_filename=firstFileName.split('.')[0] + '_' + sdate +  '.zip';
+                }
+
+
+            fetch(request_url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ processed_images: processedImages })
+            }).then(response => response.blob())
+              .then(blob => {
+                  const url = window.URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.style.display = 'none';
+                  a.href = url;
+                  a.target='_blank';
+                  a.download = download_filename;
+                  document.body.appendChild(a);
+
+                  if (file_type=='pdf')
+                      {
+                         window.open(url, '_blank');       //在新标签页打开pdf文件
+                      }
+                  else
+                      {
+                         a.click();
+                      }
+
+                  document.body.removeChild(a); //下载完成移除a标签
+              })
+              .catch(error => console.error('Error:', error));
+        }
+
+
+    </script>
 </body>
 </html>
