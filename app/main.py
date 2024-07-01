@@ -1,6 +1,8 @@
 
 
 
+# main.py
+
 
 
 from imageBinarization import imageBinarizationAdaptive
